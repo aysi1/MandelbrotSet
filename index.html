@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandelbrot Set</title>
+    <style>
+        .canvas {
+            width: 400px;
+            height: 400px;
+            margin-left: 50%;
+            transform: translateX(-50%);
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <div class="canvas">
+        <canvas></canvas>
+    </div>
+    <script type="text/javascript">
+        var canvas = document.querySelector('canvas');
+        canvas.width = 400;
+        canvas.height = 400;
+
+        var ctx = canvas.getContext('2d');
+
+        var ft = 0.1;
+
+        function createMandelbrotSet(offX, offY, Zoom) {
+            let x, y;
+            var img = ctx.createImageData(canvas.width, canvas.height);
+            for (y = 0; y < img.height; y++) {
+                for (x = 0; x < img.width; x++) {
+                    let ca = (x-offX-img.width/2)/(Zoom * 100), cb = (y+offY-img.height/2)/(Zoom * 100);
+                    let a = ca, b = cb;
+                    let ta, tb;
+                    let alpha = 1;
+                    for (let n = 0; n<400; n++) {
+                        ta = a*a - b*b;
+                        tb = 2*a*b;
+                        a = ta + ca;
+                        b = tb + cb;
+                        if (a*a + b*b > ft) {
+                            alpha = n/40;
+                            break;
+                        }
+                    }
+                    let pos = 4 * y*img.width+x*4;
+                    img.data[pos + 0] = alpha*128;
+                    img.data[pos + 1] = alpha*255;
+                    img.data[pos + 2] = (1-alpha)*255;
+                    img.data[pos + 3] = 255;
+                }
+            }
+            ctx.putImageData(img, 0, 0);
+        }
+
+        const id = setInterval(function () {
+            createMandelbrotSet(48, 0, 1.2);
+            ft += 0.1;
+            if (ft > 4)
+                clearInterval(id);
+        }, 10);
+    </script>
+</body>
+</html>
